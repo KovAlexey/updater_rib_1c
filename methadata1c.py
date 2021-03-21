@@ -1,10 +1,11 @@
 import logging
 
+
 class Methadata1C:
     _name = ""
     _this_object = None
 
-    def __init__(self, comobject, name = ""):
+    def __init__(self, comobject, name=""):
         self._name = name
         if self._name == "":
             self._this_object = comobject
@@ -12,6 +13,9 @@ class Methadata1C:
             self._this_object = getattr(comobject, name)
 
     def getchild(self, name):
+        return Methadata1C(self._this_object, name)
+
+    def getvariable(self, name):
         return getattr(self._this_object, name)
 
     def getmethod(self, name):
@@ -23,15 +27,29 @@ class CommonModuleExchange(Methadata1C):
     _node_exchange = None
     _GetExchangeParameters = None
     _StartExchange = None
+    _journal_settings = None
+    _enum_action_load = None
+    _enum_action_upload = None
 
     def __init__(self, connection):
-        super(CommonModuleExchange, self).__init__(connection, "ОбменДаннымиСервер")
-        self._GetExchangeParameters = self.getmethod("ПараметрыОбмена")
-        self._StartExchange = self.getmethod("ВыполнитьОбменДаннымиДляУзлаИнформационнойБазы")
+        super(CommonModuleExchange, self).__init__(connection)
+
+        module = Methadata1C(connection, "ОбменДаннымиСервер")
+        self._GetExchangeParameters = module.getmethod("ПараметрыОбмена")
+        self._StartExchange = module.getmethod("ВыполнитьОбменДаннымиДляУзлаИнформационнойБазы")
 
         exhange_planes_manager = Methadata1C(connection, "ПланыОбмена")
         self._node_exchange = exhange_planes_manager.getmethod("ГлавныйУзел")()
         self.__logger.debug("Модуль обмена данными успешно инициализирован!")
+
+        module = Methadata1C(connection, "ОбменДаннымиВызовСервера")
+        self._journal_settings = module.getmethod("ДанныеОтбораЖурналаРегистрации")
+
+        enums = Methadata1C(connection, "Перечисления")
+        actions_enum = enums.getchild("ДействияПриОбмене")
+        self._enum_action_load = actions_enum.getvariable("ЗагрузкаДанных")
+        self._enum_action_upload = actions_enum.getvariable("ВыгрузкаДанных")
+
         pass
 
     def start_loading(self):

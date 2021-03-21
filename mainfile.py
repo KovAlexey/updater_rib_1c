@@ -9,9 +9,10 @@ def main():
 
     updater = Node1CUpdater("D:\\temp\\", "C:\\Program Files\\1cv8\\8.3.18.1289\\bin\\", "D:\\temp\\exchange\\",
                             "РТ", "РУ", parameters)
-    if not updater.make_copy():
-        print("error")
-        return -1
+    # updater.parsefile()
+    # if not updater.make_copy():
+    #     print("error")
+    #     return -1
 
     updater.loadexchangefile()
 

@@ -8,7 +8,6 @@ from comconnector1c import ComConnector1C, ConnectionParams
 from methadata1c import CommonModuleExchange
 
 
-
 class Node1CUpdater:
     __logger = logging.getLogger("Node1CUpdater")
     _exchange_directory = ""
@@ -113,7 +112,6 @@ class Node1CUpdater:
             log.close()
 
         return True
-        # self.__logger.debug("Копия завершена. %s", result)
 
     def loadexchangefile(self):
         connection = self._connector.connect(self._connectionParams)

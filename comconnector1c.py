@@ -53,7 +53,6 @@ class ConnectionParams:
 
 class ComConnector1C:
     __component: ComConnectorInterface
-    #_connection = None
     __component_name = ""
     __logger = logging.getLogger("ComConnector")
     V83_APPLICATION = "V83.Application"
@@ -73,6 +72,3 @@ class ComConnector1C:
         self.__logger.debug('Подключение выполнено успешно')
 
         return connection
-
-    #def getconnection(self):
-        #return self._connection
