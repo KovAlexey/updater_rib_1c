@@ -38,10 +38,22 @@ class ConnectionParams:
 
         return connectstring
 
+    def getdesignerconnectionstring(self):
+        if self.file:
+            connectstring = '/F "{path}" '
+        else:
+            connectstring = '/S "{server_bd_path}" '
+
+        connectstring += '/N "{usr}" /P "{pwd}" '
+        connectstring = connectstring.format(path=self.path_to_base,
+                                             server_bd_path=self.servername + '\\' + self.bd_name,
+                                             usr=self.login, pwd=self.pwd)
+        return connectstring
+
 
 class ComConnector1C:
     __component: ComConnectorInterface
-    _connection = None
+    #_connection = None
     __component_name = ""
     __logger = logging.getLogger("ComConnector")
     V83_APPLICATION = "V83.Application"
@@ -57,16 +69,10 @@ class ComConnector1C:
     def connect(self, connectionparams: ConnectionParams):
         connectstring = connectionparams.getconnectionstring()
         self.__logger.debug('Подключаюсь к "%s"', connectstring)
-        self._connection = self.__component.Connect(connectstring)
+        connection = self.__component.Connect(connectstring)
         self.__logger.debug('Подключение выполнено успешно')
 
-    # def connect(self, server: str, bd: str, usr="", pwd=""):
-    #     connectformatstring = 'Srvr="{server}";Ref="{bd}";'
-    #     self._connect(connectformatstring.format(server=server, bd=bd), usr, pwd)
+        return connection
 
-    def getconnection(self):
-        return self._connection
-
-    # def connect(self, path: str, usr="", pwd=""):
-    #     connectformatstring = 'File="{path}";'
-    #     self._connect(connectformatstring.format(path=path), usr, pwd)
+    #def getconnection(self):
+        #return self._connection

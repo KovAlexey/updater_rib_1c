@@ -1,7 +1,13 @@
 import logging
 import re
+import subprocess
+from datetime import datetime
 from lxml import etree
+from io import StringIO
 from comconnector1c import ComConnector1C, ConnectionParams
+from methadata1c import CommonModuleExchange
+
+
 
 class Node1CUpdater:
     __logger = logging.getLogger("Node1CUpdater")
@@ -16,7 +22,8 @@ class Node1CUpdater:
     _connector: ComConnector1C
     _connectionParams: ConnectionParams
 
-    def __init__(self, working_directory: str, bin_directory, exhange_directory: str, centralnodename: str, nodename: str,
+    def __init__(self, working_directory: str, bin_directory, exhange_directory: str, centralnodename: str,
+                 nodename: str,
                  connectionparams: ConnectionParams):
         self.__logger.debug('init updater("%s", "%s", "%s")', exhange_directory, centralnodename, nodename)
         self._working_directory = working_directory
@@ -25,6 +32,7 @@ class Node1CUpdater:
         self._central_node_name = centralnodename
         self._node_name = nodename
         self._connectionParams = connectionparams
+        self._connector = ComConnector1C(ComConnector1C.V83_COMCONNECTOR)
 
     def parsefile(self):
         self._message_number = 0
@@ -72,11 +80,45 @@ class Node1CUpdater:
         self.__logger.debug("Наличие изменений: %s", self._have_changes)
         self.__logger.debug("Завершение парсинга")
 
-
     def make_copy(self):
-        command = self._bin_directory + "1cv8.exe"
-        command += " DESIGNER  "
+        self.__logger.debug("Начинаю делать копию")
+        command = "{bin}1cv8.exe DESIGNER {connectionparams} ' \ " \
+                  "/DumpIB {working_dir}{dt_name} /out {working_dir}{log_name} " \
+                  "/DumpResult {working_dir}{result_name} " \
+                  "/DisableStartupMessages /DisableStartupDialogs"
 
+        dt_name = datetime.today().strftime('%Y-%m-%d-%H-%M-%S') + '.dt'
+        command = command.format(bin=self._bin_directory,
+                                 connectionparams=self._connectionParams.getdesignerconnectionstring(),
+                                 working_dir=self._working_directory,
+                                 dt_name=dt_name,
+                                 result_name="result.txt",
+                                 log_name="log.txt"
+                                 )
+        self.__logger.debug(command)
+
+        try:
+            result = subprocess.check_call(command)
+        except Exception as e:
+            self.__logger.error("Ошибка при выгрузке копии!", exc_info=True)
+            return False
+
+        try:
+            log = open(self._working_directory + "log.txt", 'r', encoding="utf-8")
+            res = log.read()
+            self.__logger.debug(res)
+        except Exception as e:
+            self.__logger.error("Ошибка при чтении лога!", exc_info=True)
+        finally:
+            log.close()
+
+        return True
+        # self.__logger.debug("Копия завершена. %s", result)
+
+    def loadexchangefile(self):
+        connection = self._connector.connect(self._connectionParams)
+        module = CommonModuleExchange(connection)
+        return module.start_loading()
 
     def __del__(self):
         self.__logger.debug('del updater("' + self._exchange_directory + '")')
