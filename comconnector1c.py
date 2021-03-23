@@ -31,23 +31,28 @@ class ConnectionParams:
 
     def getconnectionstring(self):
         if self.file:
-            connectstring = 'File="{path}";'.format(path=self.path_to_base)
+            connectstring = 'File="{path}";'
         else:
-            connectstring = 'Srvr="{server}";Ref="{bd}";'.format(server=self.servername, bd=self.bd_name)
-        connectstring += 'Usr = "{user}";pwd = "{pwd}"'.format(user=self.login, pwd=self.pwd)
+            connectstring = 'Srvr="{server}";Ref="{bd}";'
+        connectstring += 'Usr = "{user}";pwd = "{pwd}"'
+
+        connectstring = connectstring = self._formatstring(connectstring)
 
         return connectstring
+
+    def _formatstring(self, connectstring: str):
+        return connectstring.format(server=self.servername, bd=self.bd_name,
+                                    path=self.path_to_base,
+                                    user=self.login, pwd=self.pwd)
 
     def getdesignerconnectionstring(self):
         if self.file:
             connectstring = '/F "{path}" '
         else:
-            connectstring = '/S "{server_bd_path}" '
+            connectstring = '/S "{server}\\{bd}" '
 
-        connectstring += '/N "{usr}" /P "{pwd}" '
-        connectstring = connectstring.format(path=self.path_to_base,
-                                             server_bd_path=self.servername + '\\' + self.bd_name,
-                                             usr=self.login, pwd=self.pwd)
+        connectstring += '/N "{user}" /P "{pwd}" '
+        connectstring = self._formatstring(connectstring)
         return connectstring
 
 

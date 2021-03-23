@@ -14,7 +14,10 @@ def main():
     #     print("error")
     #     return -1
 
-    updater.loadexchangefile()
+    # result = updater.loadexchangefile()
+    print(updater.update_cfg())
+
+
 
 
 if __name__ == "__main__":
