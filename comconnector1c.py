@@ -73,6 +73,7 @@ class ComConnector1C:
     def connect(self, connectionparams: ConnectionParams):
         connectstring = connectionparams.getconnectionstring()
         self.__logger.debug('Подключаюсь к "%s"', connectstring)
+        print("Подключаюсь к ", connectstring)
         connection = self.__component.Connect(connectstring)
         self.__logger.debug('Подключение выполнено успешно')
 

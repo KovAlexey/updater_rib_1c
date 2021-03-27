@@ -1,5 +1,6 @@
 import logging
-from lxml import etree
+import pythoncom
+from win32com.client import VARIANT
 
 from methadata1c import Methadata1C
 
@@ -36,23 +37,27 @@ class CommonModuleExchange(Methadata1C):
         self._method_get_journal_registration = connection.UnloadEventLog
         self._const_journal_error_level = connection.EventLogLevel.Error
 
-    def load_exchange_file(self):
+    def make_exchange(self, load: bool):
         parameters = self._method_get_exchange_parameters()
 
         self.__logger.debug("Начинаю загрузку")
-        setattr(parameters, "ВыполнятьВыгрузку", False)
-        setattr(parameters, "ВыполнятьЗагрузку", True)
-        error = [True]
-        self._method_start_exchange(self._node_exchange, parameters, error[0])
-        self.__logger.debug("Результат загрузки. Успешно: %s", not error)
+        setattr(parameters, "ВыполнятьВыгрузку", not load)
+        setattr(parameters, "ВыполнятьЗагрузку", load)
 
-        return not error[0]
+        error = VARIANT(pythoncom.VT_BYREF | pythoncom.VT_BOOL, False)
 
-    def getloadingjournal(self, work_dir):
-        journal_settings = self._method_journal_settings(self._node_exchange, self._enum_action_load)
+        self._method_start_exchange(self._node_exchange, parameters, error)
+        error = error.value
+        self.__logger.debug("Результат %s. Успешно: %s", "загрузки" if load else "выгрузки", not error)
+
+        return not error
+
+    def getloadingjournal(self, work_dir: str, load: bool):
+        enum_action = self._enum_action_load if load else self._enum_action_upload
+        journal_settings = self._method_journal_settings(self._node_exchange, enum_action)
         journal_settings.insert("Level", self._const_journal_error_level)
 
         journal = work_dir + "journal.xml"
-        res = self._method_get_journal_registration(journal, journal_settings)
+        self._method_get_journal_registration(journal, journal_settings)
 
         return journal

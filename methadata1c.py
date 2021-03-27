@@ -1,3 +1,5 @@
+import logging
+
 class Methadata1C:
     _name = ""
     _this_object = None

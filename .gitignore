@@ -1,1 +1,7 @@
 /venv/
+/config.ini
+/build/
+/dist/
+/log.txt
+/mainfile.spec
+/.idea/
