@@ -5,3 +5,11 @@
 /log.txt
 /mainfile.spec
 /.idea/
+/x64/build/
+/x32/build/
+/x32/build.bat
+/x64/mainfile.spec
+/x64/build.bat
+/x32/mainfile.spec
+/x32/dist/log.txt
+/x64/dist/log.txt

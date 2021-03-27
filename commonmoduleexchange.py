@@ -1,9 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import logging
 import pythoncom
 from win32com.client import VARIANT
-
 from methadata1c import Methadata1C
-
 
 class CommonModuleExchange(Methadata1C):
     __logger = logging.getLogger("CommonModule")
@@ -18,11 +19,13 @@ class CommonModuleExchange(Methadata1C):
 
     def __init__(self, connection):
         super(CommonModuleExchange, self).__init__(connection)
-
+        print(connection)
+        print("Получаю ОбменДаннымиСервер.ВыполнитьОбменДаннымиДляУзлаИнформационнойБазы")
         module = Methadata1C(connection, "ОбменДаннымиСервер")
         self._method_get_exchange_parameters = module.getmethod("ПараметрыОбмена")
         self._method_start_exchange = module.getmethod("ВыполнитьОбменДаннымиДляУзлаИнформационнойБазы")
 
+        print("Получаю ПланыОбмена.ГлавныйУзел")
         exсhange_planes_manager = Methadata1C(connection, "ПланыОбмена")
         self._node_exchange = exсhange_planes_manager.getmethod("ГлавныйУзел")()
         self.__logger.debug("Модуль обмена данными успешно инициализирован!")

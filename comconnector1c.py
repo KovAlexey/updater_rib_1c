@@ -2,6 +2,9 @@ import win32com.client
 import pythoncom
 import logging
 
+win32com.client.dynamic.build.valid_identifier_chars += "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ" + \
+                                                        "ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ".lower()
+
 
 class ComConnectorInterface:
     def Connect(self, connectstring: str):

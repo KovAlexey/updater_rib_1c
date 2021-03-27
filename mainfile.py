@@ -1,8 +1,9 @@
 import logging
 import time
-import configparser
+import traceback
 from nodeupteader1c import Node1CUpdater
-from comconnector1c import ConnectionParams
+
+
 
 def updater_daemon(updater:Node1CUpdater):
     last_load_message_number = 0
@@ -72,10 +73,15 @@ def updater_daemon(updater:Node1CUpdater):
 
 
 def main():
-    # bd_name = "D:\\1C Base\\RT rib"
-    # parameters = ConnectionParams(bd_name)
 
-    updater = Node1CUpdater()
+    try:
+        updater = Node1CUpdater()
+    except Exception as e:
+        traceback.print_exc()
+        print("Нажмите клюбую клавишу...")
+        input()
+        raise
+
     while True:
         print("Введите команду\n"
               "1 - Проверить подключение\n"
